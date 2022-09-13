@@ -1,4 +1,5 @@
 #include <cassert>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <unordered_set>
@@ -14,12 +15,13 @@ template <typename T> inline void hash_val(std::size_t &seed, const T &val) {
   hash_combine(seed, val);
 }
 template <typename T, typename... Types>
-inline void hash_val(std::size_t &seed, const T &val, const Types &...args) {
+inline void hash_val(std::size_t &seed, const T &val, const Types &... args) {
   hash_combine(seed, val);
   hash_val(seed, args...);
 }
 
-template <typename... Types> inline std::size_t hash_val(const Types &...args) {
+template <typename... Types>
+inline std::size_t hash_val(const Types &... args) {
   std::size_t seed = 0;
   hash_val(seed, args...);
   return seed;
@@ -34,7 +36,7 @@ struct pair_hash {
 
 void gen(const string &filename, int n, int m, int k) {
   ofstream ofs(filename);
-  ofs << n << " " << m << endl;
+  ofs << n << " " << m << "\n";
   unordered_set<pair<int, int>, pair_hash> edges;
   edges.reserve(m * 4);
   for (int i = 0; i < m; ++i) {
@@ -46,16 +48,19 @@ void gen(const string &filename, int n, int m, int k) {
     }
     edges.emplace(u, v);
     edges.emplace(v, u);
-    ofs << u << " " << v << endl;
+    ofs << u << " " << v << "\n";
   }
-  ofs << k << endl;
+  ofs << k << "\n";
   for (int i = 0; i < k; ++i) {
-    ofs << i << " 1 1 " << (n * k + m * 2) / k + 500 << " 1" << endl;
+    ofs << i << " 1 1 " << (n * k + m * 2) / k + 500 << " 1" << "\n";
   }
 }
 
 int main(int argc, char *argv[]) {
-  srand(time(NULL));
+  std::chrono::time_point<std::chrono::system_clock> now =
+      std::chrono::high_resolution_clock::now();
+  auto duration = now.time_since_epoch();
+  srand(duration.count());
   int n = 400000;
   int m = 3500000;
   int k = 10;

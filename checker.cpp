@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void check(const string &input, const string &output) {
+long long check(const string &input, const string &output) {
   ifstream ifs(input);
   ifstream ofs(output);
 
@@ -38,14 +38,20 @@ void check(const string &input, const string &output) {
     }
   }
 
-  cerr << checker.check(partitions) << endl;
+  long long result = checker.check(partitions);
+  cerr << result << endl;
 
   ifs.close();
   ofs.close();
+
+  return result;
 }
 
 int main(int argc, char *argv[]) {
   assert(argc == 3);
-  check(argv[1], argv[2]);
+  long long result = check(argv[1], argv[2]);
+  if (result < 0) {
+    return -1;
+  }
   return 0;
 }

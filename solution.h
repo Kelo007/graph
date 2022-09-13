@@ -107,8 +107,12 @@ struct Machines {
   Graph *graph;
   ll cost_bound{0};
   int machine_cnt;
-  static constexpr double W = 2;
-  Machines(int n, Graph *graph) : graph{graph}, machine_cnt{n} { m.reserve(n); }
+  double W = 1.5;
+  Machines(int n, Graph *graph) : graph{graph}, machine_cnt{n} {
+    m.reserve(n);
+    cerr << "Input W" << endl;
+    cin >> W;
+  }
 
   void add_machine(int machine_id, int node_cost, int edge_cost, int mem,
                    int comm_cost) {
