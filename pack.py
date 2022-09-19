@@ -14,7 +14,7 @@ def replace(W):
     for line in newlines:
       f.write(line)
 
-W = [1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3]
+W = [1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 2.0, 2.2, 2.4, 2.6, 3.0]
 
 for w in W:
   replace(w)
@@ -22,5 +22,6 @@ for w in W:
 
 zipfiles = ["%.2f.zip" % w for w in W]
 
+os.system("rm all.zip")
 os.system("zip all.zip %s" % " ".join(zipfiles))
 os.system("rm %s" % " ".join(zipfiles))
