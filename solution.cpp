@@ -281,7 +281,8 @@ struct Runner {
   }
 };
 
-void Solution::func(ifstream &ifs, const string &result_file) {
+void Solution::func(const string &input_file, const string &result_file) {
+  ifstream ifs(input_file);
   int n, m, machine_num, machine_id, node_cost, edge_cost, mem, comm_cost, src,
       dst;
 
@@ -308,6 +309,8 @@ void Solution::func(ifstream &ifs, const string &result_file) {
     machines.add_machine(machine_id, node_cost, edge_cost, mem, comm_cost);
   }
   timer.stop();
+
+  ifs.close();
 
   timer.start("Calcing bound");
   machines.calc_cost_bound();

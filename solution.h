@@ -107,12 +107,8 @@ struct Machines {
   Graph *graph;
   ll cost_bound{0};
   int machine_cnt;
-  double W = 1.5;
-  Machines(int n, Graph *graph) : graph{graph}, machine_cnt{n} {
-    m.reserve(n);
-    cerr << "Input W" << endl;
-    cin >> W;
-  }
+  double W = 1.45;
+  Machines(int n, Graph *graph) : graph{graph}, machine_cnt{n} { m.reserve(n); }
 
   void add_machine(int machine_id, int node_cost, int edge_cost, int mem,
                    int comm_cost) {
@@ -264,7 +260,7 @@ struct Timer {
 
 class Solution {
 public:
-  static void func(ifstream &ifs, const string &result_file);
+  static void func(const string &input_file, const string &result_file);
 };
 
 #endif
