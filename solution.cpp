@@ -128,9 +128,9 @@ struct Runner {
     if (boundart_set[u]) {
       return true;
     }
-#ifndef NDEBUG
-    cerr << "expanding boundary node " << graph.get_node_id(u) << endl;
-#endif
+    // #ifndef NDEBUG
+    //     cerr << "expanding boundary node " << graph.get_node_id(u) << endl;
+    // #endif
     boundart_set[u] = true;
     int cnt = 0;
 
@@ -146,11 +146,12 @@ struct Runner {
         if (!try_add_mem_and_cost(EDGE_MEM, now_machine->edge_cost)) {
           return false;
         } else {
-#ifndef NDEBUG
-          cerr << string_format("add edge cost %d %d", graph.get_node_id(u),
-                                graph.get_node_id(v))
-               << endl;
-#endif
+          // #ifndef NDEBUG
+          //           cerr << string_format("add edge cost %d %d",
+          //           graph.get_node_id(u),
+          //                                 graph.get_node_id(v))
+          //                << endl;
+          // #endif
         }
         assign_edge(eid);
         graph.remove_edge(u, i);
@@ -171,9 +172,9 @@ struct Runner {
   bool expand_core_node(int u) {
     assert(!core_set[u]);
     core_set[u] = true;
-#ifndef NDEBUG
-    cerr << "expanding core node " << graph.get_node_id(u) << endl;
-#endif
+    // #ifndef NDEBUG
+    //     cerr << "expanding core node " << graph.get_node_id(u) << endl;
+    // #endif
     if (!expand_boundary_node(u))
       return false;
     while (graph.g[u].size() > 0) {
@@ -190,15 +191,17 @@ struct Runner {
                                     now_machine->edge_cost)) {
         return false;
       } else {
-#ifndef NDEBUG
-        cerr << string_format("core(%d) add edge cost %d %d",
-                              graph.get_node_id(u), graph.get_node_id(u),
-                              graph.get_node_id(v))
-             << endl;
-        cerr << string_format("core(%d) add node cost %d", graph.get_node_id(u),
-                              graph.get_node_id(v))
-             << endl;
-#endif
+        // #ifndef NDEBUG
+        //         cerr << string_format("core(%d) add edge cost %d %d",
+        //                               graph.get_node_id(u),
+        //                               graph.get_node_id(u),
+        //                               graph.get_node_id(v))
+        //              << endl;
+        //         cerr << string_format("core(%d) add node cost %d",
+        //         graph.get_node_id(u),
+        //                               graph.get_node_id(v))
+        //              << endl;
+        // #endif
       }
       assign_edge(eid);
       graph.remove_edge(u, 0);
@@ -239,11 +242,11 @@ struct Runner {
         if (!add_mem_and_cost) {
           break;
         } else {
-#ifndef NDEBUG
-          cerr << string_format("add core node %d",
-                                graph.get_node_id(core_node_id))
-               << endl;
-#endif
+          // #ifndef NDEBUG
+          //           cerr << string_format("add core node %d",
+          //                                 graph.get_node_id(core_node_id))
+          //                << endl;
+          // #endif
         }
       }
       bool flag = expand_core_node(core_node_id);
@@ -258,10 +261,11 @@ struct Runner {
           no_extra_remaining_node = false;
           flag = rand() % 10 <= 8;
         }
-#ifndef NDEBUG
-        cerr << "remove core node cost " << graph.get_node_id(core_node_id)
-             << endl;
-#endif
+        // #ifndef NDEBUG
+        //         cerr << "remove core node cost " <<
+        //         graph.get_node_id(core_node_id)
+        //              << endl;
+        // #endif
       }
       if (!flag) {
         break;

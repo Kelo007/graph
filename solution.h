@@ -107,7 +107,7 @@ struct Machines {
   Graph *graph;
   ll cost_bound{0};
   int machine_cnt;
-  double W = 1.45;
+  double W = 1.6;
   Machines(int n, Graph *graph) : graph{graph}, machine_cnt{n} { m.reserve(n); }
 
   void add_machine(int machine_id, int node_cost, int edge_cost, int mem,
