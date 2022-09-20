@@ -48,6 +48,7 @@ struct Runner {
     }
 
     while (heap.size() > 0) {
+      // auto [nid, _] = heap.rand_point_and_pop();
       auto [nid, _] = heap.top();
       heap.pop();
       if (!core_set[nid] && boundart_set[nid]) {

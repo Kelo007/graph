@@ -38,7 +38,7 @@ void gen(const string &filename, int n, int m, int k) {
   ofstream ofs(filename);
   ofs << n << " " << m << "\n";
   unordered_set<pair<int, int>, pair_hash> edges;
-  edges.reserve(m * 4);
+  edges.reserve(m * 2);
   for (int i = 0; i < m; ++i) {
     int u = 0, v = 0;
     while (u == v || edges.count(make_pair(u, v)) == 1 ||
@@ -47,7 +47,6 @@ void gen(const string &filename, int n, int m, int k) {
       v = rand() % n;
     }
     edges.emplace(u, v);
-    edges.emplace(v, u);
     ofs << u << " " << v << "\n";
   }
   ofs << k << "\n";

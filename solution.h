@@ -159,7 +159,7 @@ struct Heap {
     shift_up(n);
   }
 
-  void shift_up(int idx) {
+  int shift_up(int idx) {
     while (idx > 1) {
       int p_idx = idx >> 1;
       if (data[idx].second < data[p_idx].second) {
@@ -167,9 +167,10 @@ struct Heap {
         swap(vid_to_idx[data[idx].first], vid_to_idx[data[p_idx].first]);
         idx = p_idx;
       } else {
-        break;
+        return idx;
       }
     }
+    return 1;
   }
 
   void shift_down(int idx) {
@@ -206,6 +207,16 @@ struct Heap {
     data[1] = data[n--];
     vid_to_idx[data[1].first] = 1;
     shift_down(1);
+  }
+
+  auto rand_point_and_pop() {
+    int x = rand() % n + 1;
+    auto ret = data[x];
+    data[x] = data[n--];
+    vid_to_idx[data[x].first] = x;
+    x = shift_up(x);
+    shift_down(x);
+    return ret;
   }
 
   void minus_one(int vid) {
