@@ -23,6 +23,7 @@ struct Runner {
   Heap heap;
   int now_machine_idx;
   int now_mem;
+  int now_core_node_size;
   ll now_calc_cost;
   Machine *now_machine;
   Partition *now_partition;
@@ -48,11 +49,17 @@ struct Runner {
     }
 
     while (heap.size() > 0) {
-      // auto [nid, _] = heap.rand_point_and_pop();
       auto [nid, _] = heap.top();
       heap.pop();
       if (!core_set[nid] && boundart_set[nid]) {
         core_node_id = nid;
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+        cerr << string_format("found core node %d in heap",
+                              graph.get_node_id(core_node_id))
+             << endl;
+#endif
+#endif
         break;
       }
     }
@@ -75,11 +82,18 @@ struct Runner {
           ch = ch % remaining_node.size();
           continue;
         }
-        if (graph.g[nid].size() > graph.frac * 2 || core_set[nid]) {
+        if (graph.g[nid].size() > graph.frac || core_set[nid]) {
           ch = (ch + 1) % remaining_node.size();
           continue;
         }
         core_node_id = nid;
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+        cerr << string_format("found core node %d in remaining nodes",
+                              graph.get_node_id(core_node_id))
+             << endl;
+#endif
+#endif
         break;
       }
     }
@@ -98,6 +112,14 @@ struct Runner {
           continue;
         }
         core_node_id = nid;
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+        cerr << string_format(
+                    "found core node %d in remaining nodes (large degree)",
+                    graph.get_node_id(core_node_id))
+             << endl;
+#endif
+#endif
         break;
       }
     }
@@ -129,11 +151,13 @@ struct Runner {
     if (boundart_set[u]) {
       return true;
     }
-    // #ifndef NDEBUG
-    //     cerr << "expanding boundary node " << graph.get_node_id(u) << endl;
-    // #endif
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+    cerr << "expanding boundary node " << graph.get_node_id(u) << endl;
+#endif
+#endif
     boundart_set[u] = true;
-    int cnt = 0;
+    ll cnt = 0;
 
     for (int i = 0; i < (int)graph.g[u].size();) {
       int eid = graph.g[u][i];
@@ -147,21 +171,22 @@ struct Runner {
         if (!try_add_mem_and_cost(EDGE_MEM, now_machine->edge_cost)) {
           return false;
         } else {
-          // #ifndef NDEBUG
-          //           cerr << string_format("add edge cost %d %d",
-          //           graph.get_node_id(u),
-          //                                 graph.get_node_id(v))
-          //                << endl;
-          // #endif
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+          cerr << string_format("add edge cost %d %d", graph.get_node_id(u),
+                                graph.get_node_id(v))
+               << endl;
+#endif
+#endif
         }
         assign_edge(eid);
         graph.remove_edge(u, i);
         if (!core_set[v]) {
-          heap.minus_one(v);
+          heap.minus_size(v, 1);
         }
       } else {
         ++i;
-        ++cnt;
+        cnt += 1;
       }
     }
     if (!core_set[u]) {
@@ -173,9 +198,11 @@ struct Runner {
   bool expand_core_node(int u) {
     assert(!core_set[u]);
     core_set[u] = true;
-    // #ifndef NDEBUG
-    //     cerr << "expanding core node " << graph.get_node_id(u) << endl;
-    // #endif
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+    cerr << "expanding core node " << graph.get_node_id(u) << endl;
+#endif
+#endif
     if (!expand_boundary_node(u))
       return false;
     while (graph.g[u].size() > 0) {
@@ -192,21 +219,22 @@ struct Runner {
                                     now_machine->edge_cost)) {
         return false;
       } else {
-        // #ifndef NDEBUG
-        //         cerr << string_format("core(%d) add edge cost %d %d",
-        //                               graph.get_node_id(u),
-        //                               graph.get_node_id(u),
-        //                               graph.get_node_id(v))
-        //              << endl;
-        //         cerr << string_format("core(%d) add node cost %d",
-        //         graph.get_node_id(u),
-        //                               graph.get_node_id(v))
-        //              << endl;
-        // #endif
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+        cerr << string_format("core(%d) add edge cost %d %d",
+                              graph.get_node_id(u), graph.get_node_id(u),
+                              graph.get_node_id(v))
+             << endl;
+        cerr << string_format("core(%d) add node cost %d", graph.get_node_id(u),
+                              graph.get_node_id(v))
+             << endl;
+#endif
+#endif
       }
       assign_edge(eid);
       graph.remove_edge(u, 0);
-      expand_boundary_node(v);
+      if (!expand_boundary_node(v))
+        return false;
     }
     return true;
   }
@@ -243,13 +271,16 @@ struct Runner {
         if (!add_mem_and_cost) {
           break;
         } else {
-          // #ifndef NDEBUG
-          //           cerr << string_format("add core node %d",
-          //                                 graph.get_node_id(core_node_id))
-          //                << endl;
-          // #endif
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+          cerr << string_format("add core node %d",
+                                graph.get_node_id(core_node_id))
+               << endl;
+#endif
+#endif
         }
       }
+      now_core_node_size = graph.g[core_node_id].size();
       bool flag = expand_core_node(core_node_id);
       if (add_mem_and_cost && now_size == (int)now_partition->edges.size()) {
         now_mem -= NODE_MEM;
@@ -262,11 +293,12 @@ struct Runner {
           no_extra_remaining_node = false;
           flag = rand() % 10 <= 8;
         }
-        // #ifndef NDEBUG
-        //         cerr << "remove core node cost " <<
-        //         graph.get_node_id(core_node_id)
-        //              << endl;
-        // #endif
+#ifndef NDEBUG
+#ifndef ONLINE_JUDGE
+        cerr << "remove core node cost " << graph.get_node_id(core_node_id)
+             << endl;
+#endif
+#endif
       }
       if (!flag) {
         break;

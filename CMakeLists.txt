@@ -9,4 +9,5 @@ set(CMAKE_CXX_FLAGS "-Wall")
 add_executable(main main.cpp solution.cpp)
 add_executable(checker checker.cpp)
 add_executable(generator generator.cpp)
+add_executable(test test.cpp)
 

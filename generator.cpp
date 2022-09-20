@@ -43,15 +43,21 @@ void gen(const string &filename, int n, int m, int k) {
     int u = 0, v = 0;
     while (u == v || edges.count(make_pair(u, v)) == 1 ||
            edges.count(make_pair(v, u)) == 1) {
-      u = rand() % n;
-      v = rand() % n;
+      if (rand() % 100 <= 80) {
+        u = rand() % (n / 100);
+        v = rand() % n;
+      } else {
+        u = rand() % n;
+        v = rand() % n;
+      }
     }
     edges.emplace(u, v);
     ofs << u << " " << v << "\n";
   }
   ofs << k << "\n";
   for (int i = 0; i < k; ++i) {
-    ofs << i << " 1 1 " << (n * k + m * 2) / k + 500 << " 1" << "\n";
+    ofs << i << " 1 1 " << (n * k + m * 2) / k + 500 << " 1"
+        << "\n";
   }
 }
 
@@ -60,9 +66,9 @@ int main(int argc, char *argv[]) {
       std::chrono::high_resolution_clock::now();
   auto duration = now.time_since_epoch();
   srand(duration.count());
-  int n = 400000;
+  int n = 300000;
   int m = 3500000;
-  int k = 10;
+  int k = 100;
   assert(argc >= 2);
   if (argc >= 3) {
     n = atoi(argv[2]);

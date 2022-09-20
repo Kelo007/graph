@@ -1,6 +1,10 @@
 #ifndef SOLUTION_H
 #define SOLUTION_H
 
+#ifdef ONLINE_JUDGE
+#define NDEBUG
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <chrono>
@@ -76,6 +80,8 @@ struct Graph {
   void add_edge(int u, int v) {
     u = get_inner_id(u);
     v = get_inner_id(v);
+    assert(u >= 0 && u < n);
+    assert(v >= 0 && v < n);
     int eid = edges.size();
     edges.push_back(Edge(u, v));
     g[u].push_back(eid);
@@ -204,15 +210,19 @@ struct Heap {
 
   void pop() {
     assert(n >= 1);
+    assert((int)data.size() == n + 1);
     data[1] = data[n--];
+    data.pop_back();
     vid_to_idx[data[1].first] = 1;
     shift_down(1);
   }
 
   auto rand_point_and_pop() {
+    assert((int)data.size() == n + 1);
     int x = rand() % n + 1;
     auto ret = data[x];
     data[x] = data[n--];
+    data.pop_back();
     vid_to_idx[data[x].first] = x;
     x = shift_up(x);
     shift_down(x);
@@ -222,6 +232,12 @@ struct Heap {
   void minus_one(int vid) {
     int idx = vid_to_idx[vid];
     data[idx].second--;
+    shift_up(idx);
+  }
+
+  void minus_size(int vid, int size) {
+    int idx = vid_to_idx[vid];
+    data[idx].second -= size;
     shift_up(idx);
   }
 };

@@ -14,12 +14,13 @@ template <typename T> inline void hash_val(std::size_t &seed, const T &val) {
   hash_combine(seed, val);
 }
 template <typename T, typename... Types>
-inline void hash_val(std::size_t &seed, const T &val, const Types &...args) {
+inline void hash_val(std::size_t &seed, const T &val, const Types &... args) {
   hash_combine(seed, val);
   hash_val(seed, args...);
 }
 
-template <typename... Types> inline std::size_t hash_val(const Types &...args) {
+template <typename... Types>
+inline std::size_t hash_val(const Types &... args) {
   std::size_t seed = 0;
   hash_val(seed, args...);
   return seed;
@@ -62,6 +63,14 @@ struct Partition {
   int machine_id;
   Partition(int machine_id) : machine_id(machine_id) {}
   std::vector<Edge> edges;
+};
+
+struct PartitionInfo {
+  int node_cnt{0};
+  int edge_cnt{0};
+  int boundary_node_cnt{0};
+  long long calc_cost{0};
+  long long comm_cost{0};
 };
 
 struct Checker {
@@ -120,20 +129,26 @@ struct Checker {
     long long max_calc_cost = 0;
     long long max_comm_cost = 0;
 
+    std::unordered_map<int, PartitionInfo> partition_info;
+
     for (const auto &p : partitions) {
       const auto &m = machines[p.machine_id];
       int mem = 0;
       long long calc_cost = 0;
+      auto &pi = partition_info[p.machine_id];
       for (const auto &e : p.edges) {
         mem += 2;
         calc_cost += m.edge_cost;
+        pi.edge_cnt += 1;
         if (!try_insert_node_to_map(e.first, p.machine_id)) {
           mem += 1;
           calc_cost += m.node_cost;
+          pi.node_cnt += 1;
         }
         if (!try_insert_node_to_map(e.second, p.machine_id)) {
           mem += 1;
           calc_cost += m.node_cost;
+          pi.node_cnt += 1;
         }
       }
       if (mem > m.mem) {
@@ -144,10 +159,11 @@ struct Checker {
                                  m.machine_id, mem, m.mem, calc_cost)
                 << std::endl;
       max_calc_cost = std::max(max_calc_cost, calc_cost);
+      pi.calc_cost = calc_cost;
     }
 
-    std::unordered_map<int, long long> comm_cost_map;
-
+    int tot_boundary_node = 0;
+    long long tot_boundary_node_cnt = 0;
     for (const auto &it : node_map) {
       const auto &m = it.second;
       const int size = m.size();
@@ -158,20 +174,31 @@ struct Checker {
       }
       for (int machine_id : m) {
         const auto &machine = machines[machine_id];
-        comm_cost_map[machine_id] += (long long)machine.comm_cost * (size - 1) +
-                                     (comm_cost_sum - machine.comm_cost);
+        auto &p = partition_info[machine_id];
+        p.comm_cost += (long long)machine.comm_cost * (size - 1) +
+                       (comm_cost_sum - machine.comm_cost);
+        p.boundary_node_cnt += m.size() > 1;
+        tot_boundary_node_cnt += m.size() > 1;
       }
+      tot_boundary_node += m.size() > 1;
     }
 
-    for (const auto &it : comm_cost_map) {
-      std::cerr << string_format("machine id=%d, comm_cost(%d)", it.first,
-                                 it.second)
+    for (const auto &it : partition_info) {
+      std::cerr << string_format(
+                       "machine id=%d, calc_cost(%lld), comm_cost(%lld), "
+                       "node_cnt(%d), edge_cnt(%d), boundary_node_cnt(%d)",
+                       it.first, it.second.calc_cost, it.second.comm_cost,
+                       it.second.node_cnt, it.second.edge_cnt,
+                       it.second.boundary_node_cnt)
                 << std::endl;
-      max_comm_cost = std::max(max_comm_cost, it.second);
+      max_comm_cost = std::max(max_comm_cost, it.second.comm_cost);
     }
 
-    std::cerr << string_format("max_calc_cost=%lld, max_comm_cost=%lld",
-                               max_calc_cost, max_comm_cost)
+    std::cerr << string_format(
+                     "max_calc_cost=%lld, max_comm_cost=%lld, "
+                     "tot_boundary_node=%d, tot_boundary_node_cnt=%lld",
+                     max_calc_cost, max_comm_cost, tot_boundary_node,
+                     tot_boundary_node_cnt)
               << std::endl;
 
     return max_calc_cost + max_comm_cost;
