@@ -182,11 +182,11 @@ struct Runner {
         assign_edge(eid);
         graph.remove_edge(u, i);
         if (!core_set[v]) {
-          heap.minus_size(v, now_core_node_size);
+          heap.minus_size(v, 1 * now_core_node_size + 9 * 2 * graph.frac);
         }
       } else {
         ++i;
-        cnt += graph.g[v].size();
+        cnt += 1 * graph.g[v].size() + 9 * 2 * graph.frac;
       }
     }
     if (!core_set[u]) {

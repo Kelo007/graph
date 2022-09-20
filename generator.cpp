@@ -34,7 +34,7 @@ struct pair_hash {
   }
 };
 
-void gen(const string &filename, int n, int m, int k) {
+void gen(const string &filename, int n, int m, int k, int p) {
   ofstream ofs(filename);
   ofs << n << " " << m << "\n";
   unordered_set<pair<int, int>, pair_hash> edges;
@@ -43,7 +43,7 @@ void gen(const string &filename, int n, int m, int k) {
     int u = 0, v = 0;
     while (u == v || edges.count(make_pair(u, v)) == 1 ||
            edges.count(make_pair(v, u)) == 1) {
-      if (rand() % 100 <= 80) {
+      if (rand() % 100 <= p) {
         u = rand() % (n / 100);
         v = rand() % n;
       } else {
@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
   int n = 300000;
   int m = 3500000;
   int k = 100;
+  int p = 80;
   assert(argc >= 2);
   if (argc >= 3) {
     n = atoi(argv[2]);
@@ -79,7 +80,10 @@ int main(int argc, char *argv[]) {
   if (argc >= 5) {
     k = atoi(argv[4]);
   }
-  gen(argv[1], n, m, k);
+  if (argc >= 6) {
+    p = atoi(argv[5]);
+  }
+  gen(argv[1], n, m, k, p);
 
   return 0;
 }
