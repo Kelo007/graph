@@ -16,13 +16,13 @@
 #ifdef DEBUG_LOG
 #define debug(x) (x)
 #else
-#define debug(x)
+#define debug(x) ((void)0)
 #endif
 
 #ifdef INFO_LOG
 #define info(x) (x)
 #else
-#define info(x)
+#define info(x) ((void)0)
 #endif
 
 #include <algorithm>
