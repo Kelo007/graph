@@ -42,7 +42,6 @@ struct Runner {
 
   int choose_core_node() {
     int core_node_id = -1;
-    static bool no_extra_remaining_node = false;
 
     if (no_extra_remaining_node) {
       return core_node_id;
@@ -207,7 +206,7 @@ struct Runner {
       return false;
     while (graph.g[u].size() > 0) {
       int eid = graph.g[u].front();
-      auto &e = graph.edges[eid];
+      const auto &e = graph.edges[eid];
       if (e.alloc) {
         graph.remove_edge(u, 0);
         continue;
@@ -240,12 +239,13 @@ struct Runner {
   }
 
   void assign_one_partition(int index) {
-    cerr << string_format(
-                "assigning one partition to machine (idx=%d), mem=%d, bound=%d",
-                index, machines->m[index].mem,
-                machines->m[index].calc_node_bound(machines->cost_bound,
-                                                   graph.frac))
-         << endl;
+    log(cerr
+        << string_format(
+               "assigning one partition to machine (idx=%d), mem=%d, bound=%d",
+               index, machines->m[index].mem,
+               machines->m[index].calc_node_bound(machines->cost_bound,
+                                                  graph.frac))
+        << endl);
     fill(core_set.begin(), core_set.end(), false);
     fill(boundart_set.begin(), boundart_set.end(), false);
     heap.clear();
@@ -255,6 +255,7 @@ struct Runner {
     now_calc_cost = 0;
     now_partition = &partitions[index];
     now_partition->machine_id = now_machine->machine_id;
+    no_extra_remaining_node = false;
 
     while (now_mem + EDGE_MEM <= now_machine->mem &&
            now_calc_cost + now_machine->edge_cost <= machines->cost_bound) {
@@ -305,10 +306,11 @@ struct Runner {
       }
     }
 
-    cerr << string_format("finished to assign machine (idx=%d), mem_cost=%d, "
-                          "calc_cost=%lld",
-                          index, now_mem, now_calc_cost)
-         << endl;
+    log(cerr << string_format(
+                    "finished to assign machine (idx=%d), mem_cost=%d, "
+                    "calc_cost=%lld",
+                    index, now_mem, now_calc_cost)
+             << endl);
   }
 
   void run() {
@@ -324,7 +326,7 @@ void Solution::func(const string &input_file, const string &result_file) {
       dst;
 
   ifs >> n >> m;
-  cerr << string_format("n = %d, m = %d", n, m) << endl;
+  log(cerr << string_format("n = %d, m = %d", n, m) << endl);
   Graph graph{n, m};
 
   Timer timer;
@@ -337,7 +339,7 @@ void Solution::func(const string &input_file, const string &result_file) {
   timer.stop();
 
   ifs >> machine_num;
-  cerr << "machine_num = " << machine_num << endl;
+  log(cerr << "machine_num = " << machine_num << endl);
 
   timer.start("Adding machines");
   Machines machines{machine_num, &graph};
@@ -354,7 +356,7 @@ void Solution::func(const string &input_file, const string &result_file) {
   machines.sort_by_bound();
   timer.stop();
 
-  cerr << "machines calc_bound = " << machines.cost_bound << endl;
+  log(cerr << "machines calc_bound = " << machines.cost_bound << endl);
 
   timer.start("Running");
   Runner runner{graph, &machines};

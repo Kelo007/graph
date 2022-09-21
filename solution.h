@@ -3,6 +3,9 @@
 
 #ifdef ONLINE_JUDGE
 #define NDEBUG
+#define log(x)
+#else
+#define log(x) (x)
 #endif
 
 #include <algorithm>
@@ -15,6 +18,21 @@
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
+
+// rand
+//
+// static unsigned long int next = 1;
+
+// static int my_rand(void) // RAND_MAX assumed to be 32767
+// {
+//   next = next * 1103515245 + 12345;
+//   return (unsigned int)(next / 65536) % 32768;
+// }
+
+// static void my_srand(unsigned int seed) { next = seed; }
+
+// #define rand my_rand
+// #define srand my_srand
 
 using namespace std;
 using ll = long long;
@@ -75,7 +93,10 @@ struct Graph {
     return it->second;
   }
 
-  int get_node_id(int u) { return inner_id_to_node_id[u]; }
+  int get_node_id(int u) {
+    assert(u >= 0 && u < n);
+    return inner_id_to_node_id[u];
+  }
 
   void add_edge(int u, int v) {
     u = get_inner_id(u);
@@ -89,7 +110,7 @@ struct Graph {
   }
 
   void remove_edge(int u, int idx) {
-    assert(u < n);
+    assert(u >= 0 && u < n);
     assert(idx < (int)g[u].size());
     g[u][idx] = g[u].back();
     g[u].pop_back();
@@ -160,6 +181,7 @@ struct Heap {
   }
 
   void insert(int vid, ll cost) {
+    assert(vid >= 0 && vid < (int)vid_to_idx.size());
     vid_to_idx[vid] = ++n;
     data.emplace_back(vid, cost);
     shift_up(n);
@@ -234,12 +256,16 @@ struct Heap {
 
   void minus_one(int vid) {
     int idx = vid_to_idx[vid];
+    assert(vid >= 0 && vid < (int)vid_to_idx.size());
+    assert(idx >= 1 && idx <= n);
     data[idx].second--;
     shift_up(idx);
   }
 
   void minus_size(int vid, int size) {
     int idx = vid_to_idx[vid];
+    assert(vid >= 0 && vid < (int)vid_to_idx.size());
+    assert(idx >= 1 && idx <= n);
     data[idx].second -= size;
     shift_up(idx);
   }
@@ -265,8 +291,8 @@ struct Timer {
   bool valid{false};
 
   void start(const string &x) {
-    cerr << YELLOW << string_format("Timer(%15s) start", x.data()) << RESET
-         << endl;
+    log(cerr << YELLOW << string_format("Timer(%15s) start", x.data()) << RESET
+             << endl);
     start_time = chrono::system_clock::now();
     id = x;
     valid = true;
@@ -278,10 +304,10 @@ struct Timer {
     auto stop_time = chrono::system_clock::now();
     auto duration =
         chrono::duration_cast<chrono::milliseconds>(stop_time - start_time);
-    cerr << YELLOW
-         << string_format("Timer(%15s) stop: cost %d ms", id.data(),
-                          duration.count())
-         << RESET << endl;
+    log(cerr << YELLOW
+             << string_format("Timer(%15s) stop: cost %d ms", id.data(),
+                              duration.count())
+             << RESET << endl);
     valid = false;
   }
 
