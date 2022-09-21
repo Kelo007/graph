@@ -185,8 +185,11 @@ struct Heap {
       int l = idx << 1;
       int r = l | 1;
 
-      if (r > n) {
+      if (l > n) {
         return;
+      }
+      if (r > n) {
+        ch = l;
       } else {
         ch = data[l].second < data[r].second ? l : r;
       }
