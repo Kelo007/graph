@@ -2,10 +2,27 @@
 #define SOLUTION_H
 
 #ifdef ONLINE_JUDGE
-#define NDEBUG
-#define log(x)
+#undef DEBUG_LOG
+#undef INFO_LOG
+#undef ASSERT_EN
+#endif
+
+#ifdef ASSERT_EN
+#undef NDEBUG
 #else
-#define log(x) (x)
+#define NDEBUG
+#endif
+
+#ifdef DEBUG_LOG
+#define debug(x) (x)
+#else
+#define debug(x)
+#endif
+
+#ifdef INFO_LOG
+#define info(x) (x)
+#else
+#define info(x)
 #endif
 
 #include <algorithm>
@@ -291,8 +308,8 @@ struct Timer {
   bool valid{false};
 
   void start(const string &x) {
-    log(cerr << YELLOW << string_format("Timer(%15s) start", x.data()) << RESET
-             << endl);
+    info(cerr << YELLOW << string_format("Timer(%15s) start", x.data()) << RESET
+              << endl);
     start_time = chrono::system_clock::now();
     id = x;
     valid = true;
@@ -304,10 +321,10 @@ struct Timer {
     auto stop_time = chrono::system_clock::now();
     auto duration =
         chrono::duration_cast<chrono::milliseconds>(stop_time - start_time);
-    log(cerr << YELLOW
-             << string_format("Timer(%15s) stop: cost %d ms", id.data(),
-                              duration.count())
-             << RESET << endl);
+    info(cerr << YELLOW
+              << string_format("Timer(%15s) stop: cost %d ms", id.data(),
+                               duration.count())
+              << RESET << endl);
     valid = false;
   }
 

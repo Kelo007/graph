@@ -52,13 +52,9 @@ struct Runner {
       heap.pop();
       if (!core_set[nid] && boundart_set[nid]) {
         core_node_id = nid;
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-        cerr << string_format("found core node %d in heap",
-                              graph.get_node_id(core_node_id))
-             << endl;
-#endif
-#endif
+        debug(cerr << string_format("found core node %d in heap",
+                                    graph.get_node_id(core_node_id))
+                   << endl);
         break;
       }
     }
@@ -86,13 +82,9 @@ struct Runner {
           continue;
         }
         core_node_id = nid;
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-        cerr << string_format("found core node %d in remaining nodes",
-                              graph.get_node_id(core_node_id))
-             << endl;
-#endif
-#endif
+        debug(cerr << string_format("found core node %d in remaining nodes",
+                                    graph.get_node_id(core_node_id))
+                   << endl);
         break;
       }
     }
@@ -111,14 +103,11 @@ struct Runner {
           continue;
         }
         core_node_id = nid;
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-        cerr << string_format(
-                    "found core node %d in remaining nodes (large degree)",
-                    graph.get_node_id(core_node_id))
-             << endl;
-#endif
-#endif
+        debug(
+            cerr << string_format(
+                        "found core node %d in remaining nodes (large degree)",
+                        graph.get_node_id(core_node_id))
+                 << endl);
         break;
       }
     }
@@ -150,11 +139,7 @@ struct Runner {
     if (boundart_set[u]) {
       return true;
     }
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-    cerr << "expanding boundary node " << graph.get_node_id(u) << endl;
-#endif
-#endif
+    debug(cerr << "expanding boundary node " << graph.get_node_id(u) << endl);
     boundart_set[u] = true;
     ll cnt = 0;
 
@@ -170,13 +155,10 @@ struct Runner {
         if (!try_add_mem_and_cost(EDGE_MEM, now_machine->edge_cost)) {
           return false;
         } else {
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-          cerr << string_format("add edge cost %d %d", graph.get_node_id(u),
-                                graph.get_node_id(v))
-               << endl;
-#endif
-#endif
+          debug(cerr << string_format("add edge cost %d %d",
+                                      graph.get_node_id(u),
+                                      graph.get_node_id(v))
+                     << endl);
         }
         assign_edge(eid);
         graph.remove_edge(u, i);
@@ -197,11 +179,7 @@ struct Runner {
   bool expand_core_node(int u) {
     assert(!core_set[u]);
     core_set[u] = true;
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-    cerr << "expanding core node " << graph.get_node_id(u) << endl;
-#endif
-#endif
+    debug(cerr << "expanding core node " << graph.get_node_id(u) << endl);
     if (!expand_boundary_node(u))
       return false;
     while (graph.g[u].size() > 0) {
@@ -218,17 +196,13 @@ struct Runner {
                                     now_machine->edge_cost)) {
         return false;
       } else {
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-        cerr << string_format("core(%d) add edge cost %d %d",
-                              graph.get_node_id(u), graph.get_node_id(u),
-                              graph.get_node_id(v))
-             << endl;
-        cerr << string_format("core(%d) add node cost %d", graph.get_node_id(u),
-                              graph.get_node_id(v))
-             << endl;
-#endif
-#endif
+        debug(cerr << string_format("core(%d) add edge cost %d %d",
+                                    graph.get_node_id(u), graph.get_node_id(u),
+                                    graph.get_node_id(v))
+                   << endl);
+        debug(cerr << string_format("core(%d) add node cost %d",
+                                    graph.get_node_id(u), graph.get_node_id(v))
+                   << endl);
       }
       assign_edge(eid);
       graph.remove_edge(u, 0);
@@ -239,13 +213,13 @@ struct Runner {
   }
 
   void assign_one_partition(int index) {
-    log(cerr
-        << string_format(
-               "assigning one partition to machine (idx=%d), mem=%d, bound=%d",
-               index, machines->m[index].mem,
-               machines->m[index].calc_node_bound(machines->cost_bound,
-                                                  graph.frac))
-        << endl);
+    info(cerr
+         << string_format(
+                "assigning one partition to machine (idx=%d), mem=%d, bound=%d",
+                index, machines->m[index].mem,
+                machines->m[index].calc_node_bound(machines->cost_bound,
+                                                   graph.frac))
+         << endl);
     fill(core_set.begin(), core_set.end(), false);
     fill(boundart_set.begin(), boundart_set.end(), false);
     heap.clear();
@@ -272,13 +246,9 @@ struct Runner {
         if (!add_mem_and_cost) {
           break;
         } else {
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-          cerr << string_format("add core node %d",
-                                graph.get_node_id(core_node_id))
-               << endl;
-#endif
-#endif
+          debug(cerr << string_format("add core node %d",
+                                      graph.get_node_id(core_node_id))
+                     << endl);
         }
       }
       now_core_node_size = graph.g[core_node_id].size();
@@ -294,23 +264,19 @@ struct Runner {
           no_extra_remaining_node = false;
           flag = rand() % 10 <= 8;
         }
-#ifndef NDEBUG
-#ifndef ONLINE_JUDGE
-        cerr << "remove core node cost " << graph.get_node_id(core_node_id)
-             << endl;
-#endif
-#endif
+        debug(cerr << "remove core node cost "
+                   << graph.get_node_id(core_node_id) << endl);
       }
       if (!flag) {
         break;
       }
     }
 
-    log(cerr << string_format(
-                    "finished to assign machine (idx=%d), mem_cost=%d, "
-                    "calc_cost=%lld",
-                    index, now_mem, now_calc_cost)
-             << endl);
+    info(cerr << string_format(
+                     "finished to assign machine (idx=%d), mem_cost=%d, "
+                     "calc_cost=%lld",
+                     index, now_mem, now_calc_cost)
+              << endl);
   }
 
   void run() {
@@ -326,7 +292,7 @@ void Solution::func(const string &input_file, const string &result_file) {
       dst;
 
   ifs >> n >> m;
-  log(cerr << string_format("n = %d, m = %d", n, m) << endl);
+  info(cerr << string_format("n = %d, m = %d", n, m) << endl);
   Graph graph{n, m};
 
   Timer timer;
@@ -339,7 +305,7 @@ void Solution::func(const string &input_file, const string &result_file) {
   timer.stop();
 
   ifs >> machine_num;
-  log(cerr << "machine_num = " << machine_num << endl);
+  info(cerr << "machine_num = " << machine_num << endl);
 
   timer.start("Adding machines");
   Machines machines{machine_num, &graph};
@@ -356,7 +322,7 @@ void Solution::func(const string &input_file, const string &result_file) {
   machines.sort_by_bound();
   timer.stop();
 
-  log(cerr << "machines calc_bound = " << machines.cost_bound << endl);
+  info(cerr << "machines calc_bound = " << machines.cost_bound << endl);
 
   timer.start("Running");
   Runner runner{graph, &machines};
@@ -377,4 +343,6 @@ void Solution::func(const string &input_file, const string &result_file) {
   }
   ofs.close();
   timer.stop();
+
+  assert(1 == 0);
 }
