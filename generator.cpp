@@ -56,7 +56,10 @@ void gen(const string &filename, int n, int m, int k, int p) {
   }
   ofs << k << "\n";
   for (int i = 0; i < k; ++i) {
-    ofs << i << " 1 1 " << (n * k + m * 2) / k + 500 << " 1"
+    // ofs << i << " 1 1 " << (rand() & 1 ? (n * k + m * 2) / k + 500 : 2546457)
+    //     << " 1"
+    //     << "\n";
+    ofs << i << " 10 10 " << (rand() % 5 == 0 ? 10000000 : 3000000) << " 10"
         << "\n";
   }
 }
